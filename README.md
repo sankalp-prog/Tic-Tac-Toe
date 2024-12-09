@@ -1,24 +1,20 @@
-# tic-tac-toe
+# Tic-Tac-Toe 🕹️
 
-## Project setup
-```
-npm install
-```
+A simple Tic-Tac-Toe game built to have fun and learn! 
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## Features 🚀
+- Play a classic game of Tic-Tac-Toe.
+- Single-player mode (for now).
 
-### Compiles and minifies for production
-```
-npm run build
-```
+## TODOs 📝
+- [ ] **Make the game multiplayer**  
+  Add functionality to allow two players to play from different devices.
 
-### Lints and fixes files
-```
-npm run lint
-```
+- [ ] **Enhance UI with animations and images**  
+  Improve the user interface with smooth animations and replace text-based 'X' and 'O' with visually appealing images.
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+- [ ] **Deploy the site**  
+  Host the game online so everyone can enjoy it!
+
+
+
