@@ -6,8 +6,8 @@
         {{ square.value }}
       </div>
     </div>
-    <div v-if="result === 'player'">Player wins</div>
-    <div v-else-if="result === 'computer'">Computer wins</div>
+    <div v-if="result === 'player'">You Win</div>
+    <div v-else-if="result === 'opponent'">Opponent wins</div>
     <div v-else-if="result === 'draw'">It's a Draw</div>
     <!-- <button @click="reset">Reset</button> -->
     <!-- <select @change="setDifficulty">
@@ -28,10 +28,32 @@ if (localStorage.userId) {
   localStorage.userId = id;
 }
 export default {
+  mounted() {
+    setInterval(async () => {
+      const response = await fetch(`http://localhost:8000/api/updateBoard`);
+      const data = await response.json();
+      console.log(data);
+      this.squares = data.squares;
+      if (data.result) {
+        if (data.result == id) {
+          this.result = 'player';
+        } else if (data.result === 'Draw') {
+          this.result = 'draw';
+        } else {
+          this.result = 'opponent';
+        }
+      }
+      // Determine whose turn it's to play
+      if (data.playerTurn) {
+        this.playerTurn = data.playerTurn;
+      }
+    }, 1000);
+  },
   data() {
     return {
+      playerTurn: id,
       difficulty: 'random',
-      // Player will always be X
+      //First player will always be X
       char: '',
       result: '',
       squares: [
@@ -123,37 +145,39 @@ export default {
 
     async playerInput(id) {
       // Check for player to do nothing if he clicks on a pre-populated square.
+      // if (this.result !== '' || this.playerTurn != Number(id)) {
       if (this.result !== '') {
         return;
       }
-      // this.char = 'X';
-      const selectedSquare = this.squares[id];
-      console.log(selectedSquare.id);
-      this.char = await this.testBackend(selectedSquare);
-      // console.log(this.char);
-      if (selectedSquare.value === '') {
-        selectedSquare.value = this.char;
-        if (this.check(this.char)) {
-          this.result = 'player';
-        } else if (!this.squares.find((square) => square.value === '')) {
-          // this.computerInput();
-          this.result = 'draw';
-        }
+      // if (this.playerTurn != id) {
+
+      // }
+      const backendData = await this.testBackend(this.squares[id]);
+      this.char = backendData;
+      if (this.squares[id].value === '') {
+        // below line not required but reduces latency in frontend
+        this.squares[id].value = this.char;
+        // // check if the player won
+        // if (this.check(this.char)) {
+        //   this.result = 'player';
+        // } else if (!this.squares.find((square) => square.value === '')) {
+        //   this.result = 'draw';
+        // }
       }
     },
 
-    check(char) {
-      for (let i = 0; i < this.winningSquares.length; i++) {
-        let [a, b, c] = this.winningSquares[i];
-        let squareA = this.squares[a];
-        let squareB = this.squares[b];
-        let squareC = this.squares[c];
-        if (squareA.value === char && squareB.value === char && squareC.value === char) {
-          return true;
-        }
-      }
-      return false;
-    },
+    // check(char) {
+    //   for (let i = 0; i < this.winningSquares.length; i++) {
+    //     let [a, b, c] = this.winningSquares[i];
+    //     let squareA = this.squares[a];
+    //     let squareB = this.squares[b];
+    //     let squareC = this.squares[c];
+    //     if (squareA.value === char && squareB.value === char && squareC.value === char) {
+    //       return true;
+    //     }
+    //   }
+    //   return false;
+    // },
 
     // reset() {
     //   this.char = '';
@@ -172,18 +196,17 @@ export default {
     // },
 
     // Polling
+    // async testBackend(selectedSquare) {
+    //   console.log(selectedSquare);
+    //   const response = await fetch(`http://localhost:8000/api/squares/${id}?selectedSquare=${JSON.stringify(selectedSquare)}`);
+    //   const data = await response.text();
+    //   return data;
+    // },
+
     async testBackend(selectedSquare) {
-      const response = await fetch(`http://localhost:8000/api/squares/${id}?selectedSquare=${selectedSquare}`);
+      const response = await fetch(`http://localhost:8000/api/squares/${id}?selectedSquare=${JSON.stringify(selectedSquare)}`);
       const data = await response.text();
       return data;
-    },
-
-    updateBoard() {
-      setInterval(async () => {
-        const response = await fetch(`http://localhost:8000/api/updateBoard`);
-        const data = await response.json();
-        this.squares = data;
-      }, 1000);
     },
   },
 };
