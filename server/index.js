@@ -31,8 +31,8 @@ const winningSquares = [
 ];
 
 function check(char) {
-  for (let i = 0; i < winningSquares.length; i++) {
-    let [a, b, c] = winningSquares[i];
+  for (let winningSquare of winningSquares) {
+    let [a, b, c] = winningSquare;
     let squareA = squares[a];
     let squareB = squares[b];
     let squareC = squares[c];
@@ -43,19 +43,13 @@ function check(char) {
   return false;
 }
 
-let playerTurn;
-
 // const users = {71: 'X', 72: 'O'};
 const users = {};
+let playerTurn;
 app.get('/api/squares/:id', (req, res) => {
-  if (Object.keys(users).length > 2) {
-    res.send('Error: More than 2 Players detected.');
+  if (playerTurn && playerTurn != req.params.id) {
+    return;
   }
-  // First player to start will be assigned X , second player will be assigned O
-  if (Object.keys(users).length !== 2 && !users[req.params.id]) {
-    users[req.params.id] = Object.keys(users).length === 0 ? 'X' : 'O';
-  }
-  console.log(users);
   // Adding the char of the player to the square
   const square = JSON.parse(req.query.selectedSquare);
   if (squares[square.id].value === '') {
@@ -67,27 +61,24 @@ app.get('/api/squares/:id', (req, res) => {
       result = 'Draw';
     }
     // Very crude way of saying that it's now the opponents turn
-    if (Object.keys(users).length === 2) {
-      playerTurn = Object.keys(users).find((user) => user != req.params.id);
-    } 
-    // else if (Object.keys(users.length === 1 && users[req.params.id])){
-    //   playerTurn = 
-    // }
-    // console.log(playerTurn);
-    res.send(users[req.params.id]);
+    playerTurn = Object.keys(users).length === 2 ? Object.keys(users).find((user) => user != req.params.id) : Object.keys(users)[0];
+    return res.send(users[req.params.id]);
   }
 });
 
 app.get('/api/updateBoard', (req, res) => {
   res.json({ squares: squares, result: result, playerTurn: playerTurn });
-}); 
+});
 
-// app.get('/api/users/:id', (req, res) => {
-//   if (Object.keys(users).length > 2) {
-//     res.send("Error: More than 2 players detected")
-//   }
-//   users[Number(req.params.id)] = Object.keys(users).length === 0 ? 'X' : 'O';
-// })
+app.get('/api/users/:id', (req, res) => {
+  if (Object.keys(users).length >= 2) {
+    return;
+  }
+  if (!users[req.params.id]) {
+    users[Number(req.params.id)] = Object.keys(users).length === 0 ? 'X' : 'O';
+  }
+  console.log(users);
+});
 
 app.listen(8000, () => {
   console.log('Backend listening on port 8000');
