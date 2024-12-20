@@ -2,9 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router';
 
 const routes = [
   {
-    path: '/',
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: () => import('@/pages/SessionDashboard.vue'),
+  },
+  {
+    path: '/game/:sessionId',
     name: 'Game',
     component: () => import('@/pages/TicTacToe.vue'),
+    props: true,
   },
 ];
 

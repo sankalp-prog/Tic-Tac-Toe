@@ -1,6 +1,7 @@
 <template>
   <section>
     <h1>Tic Tac Toe</h1>
+    <h2>SessionId: {{ sessionId }}</h2>
     <div id="grid">
       <div class="square" v-for="square in squares" :key="square.id" @click="playerInput(square.id)">
         {{ square.value }}
@@ -22,9 +23,13 @@ if (localStorage.userId) {
   localStorage.userId = id;
 }
 export default {
+  props: ['sessionId'],
   mounted() {
     setInterval(async () => {
-      const response = await fetch(`http://localhost:8000/api/updateBoard`);
+      if (this.sessionId == 0) {
+        return;
+      }
+      const response = await fetch(`http://localhost:8000/api/updateBoard/${this.sessionId}`);
       const data = await response.json();
       this.squares = data.squares;
       if (data.result) {
@@ -37,7 +42,6 @@ export default {
         }
       }
     }, 1000);
-    this.updateUsers();
   },
   data() {
     return {
@@ -56,26 +60,9 @@ export default {
         { id: 7, value: '' },
         { id: 8, value: '' },
       ],
-      winningSquares: [
-        [0, 1, 2],
-        [3, 4, 5],
-        [6, 7, 8],
-        [0, 3, 6],
-        [1, 4, 7],
-        [2, 5, 8],
-        [0, 4, 8],
-        [2, 4, 6],
-      ],
     };
   },
   methods: {
-    async updateUsers() {
-      const response = await fetch(`http://localhost:8000/api/users/${id}`);
-      const data = await response;
-      console.log('data: ');
-      console.log(data);
-    },
-
     async playerInput(id) {
       // Check for player to do nothing if he clicks on a pre-populated square.
       if (this.result !== '') {
@@ -90,13 +77,13 @@ export default {
     },
 
     async testBackend(selectedSquare) {
-      const response = await fetch(`http://localhost:8000/api/squares/${id}?selectedSquare=${JSON.stringify(selectedSquare)}`);
+      const response = await fetch(`http://localhost:8000/api/squares/${id}/${this.sessionId}?selectedSquare=${JSON.stringify(selectedSquare)}`);
       const data = await response.text();
       return data;
     },
 
     async resetGame() {
-      fetch(`http://localhost:8000/api/resetGame`);
+      fetch(`http://localhost:8000/api/resetGame/${this.sessionId}`);
     },
   },
 };
