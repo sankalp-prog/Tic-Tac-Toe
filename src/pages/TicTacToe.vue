@@ -15,12 +15,12 @@
 </template>
 
 <script>
-let id;
+let userId;
 if (localStorage.userId) {
-  id = localStorage.userId;
+  userId = localStorage.userId;
 } else {
-  id = Math.floor(Math.random() * 100);
-  localStorage.userId = id;
+  userId = Math.floor(Math.random() * 100);
+  localStorage.userId = userId;
 }
 export default {
   props: ['sessionId'],
@@ -33,7 +33,7 @@ export default {
       const data = await response.json();
       this.squares = data.squares;
       if (data.result) {
-        if (data.result == id) {
+        if (data.result == userId) {
           this.result = 'player';
         } else if (data.result === 'Draw') {
           this.result = 'draw';
@@ -45,7 +45,7 @@ export default {
   },
   data() {
     return {
-      playerTurn: id,
+      playerTurn: userId,
       difficulty: 'random',
       char: '',
       result: '',
@@ -63,21 +63,21 @@ export default {
     };
   },
   methods: {
-    async playerInput(id) {
+    async playerInput(squareId) {
       // Check for player to do nothing if he clicks on a pre-populated square.
       if (this.result !== '') {
         return;
       }
-      const backendData = await this.testBackend(this.squares[id]);
+      const backendData = await this.testBackend(this.squares[squareId]);
       this.char = backendData;
-      if (this.squares[id].value === '') {
+      if (this.squares[squareId].value === '') {
         // below line not required but reduces latency in frontend
-        this.squares[id].value = this.char;
+        this.squares[squareId].value = this.char;
       }
     },
 
     async testBackend(selectedSquare) {
-      const response = await fetch(`http://localhost:8000/api/squares/${id}/${this.sessionId}?selectedSquare=${JSON.stringify(selectedSquare)}`);
+      const response = await fetch(`http://localhost:8000/api/squares/${userId}/${this.sessionId}?selectedSquare=${JSON.stringify(selectedSquare)}`);
       const data = await response.text();
       return data;
     },
