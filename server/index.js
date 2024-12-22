@@ -73,9 +73,10 @@ app.get('/api/squares/:id/:sessionId', (req, res) => {
     return;
   }
   // Adding the char of the player to the square
-  const square = JSON.parse(req.query.selectedSquare);
-  if (session.squares[square.id].value === '') {
-    session.squares[square.id] = { id: square.id, value: session.users[req.params.id] };
+  const squareId = req.query.selectedSquareId;
+  const square = session.squares[squareId];
+  if (square.value === '') {
+    square.value = session.users[req.params.id];
     // check for winning
     if (checkForWin(session.users[req.params.id], session.squares)) {
       session.result = req.params.id;

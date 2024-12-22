@@ -68,7 +68,7 @@ export default {
       if (this.result !== '') {
         return;
       }
-      const backendData = await this.testBackend(this.squares[squareId]);
+      const backendData = await this.testBackend(squareId);
       this.char = backendData;
       if (this.squares[squareId].value === '') {
         // below line not required but reduces latency in frontend
@@ -76,8 +76,8 @@ export default {
       }
     },
 
-    async testBackend(selectedSquare) {
-      const response = await fetch(`http://localhost:8000/api/squares/${userId}/${this.sessionId}?selectedSquare=${JSON.stringify(selectedSquare)}`);
+    async testBackend(squareId) {
+      const response = await fetch(`http://localhost:8000/api/squares/${userId}/${this.sessionId}?selectedSquareId=${squareId}`);
       const data = await response.text();
       return data;
     },
