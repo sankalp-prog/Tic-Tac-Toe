@@ -38,14 +38,24 @@ const createRandomSessionId = () => String(Math.floor(1000000 + Math.random() * 
 
 // end goal: sessions = {1234567: {users: {Id1: 'X', Id2: 'O'}, squares: squares, playerTurn: playerTurn, result: result}}
 const sessions = {};
-app.get('/api/users/:id/:sessionId', (req, res) => {
-  const sessionId = req.params.sessionId == 0 ? createRandomSessionId() : req.params.sessionId;
 
-  const userId = req.params.id;
+app.get('/api/createSession/:userId', (req, res) => {
+  const sessionId = createRandomSessionId();
+  const userId = req.params.userId;
+  const session = (sessions[sessionId] = {});
+  // First user is assigned 'X'
+  session.users = { [userId]: 'X' };
+  session.squares = JSON.parse(JSON.stringify(SQUARES));
+  console.log(sessions);
+  return res.send(sessionId);
+});
+
+app.get('/api/joinSession/:userId/:sessionId', (req, res) => {
+  const sessionId = req.params.sessionId;
+  const userId = req.params.userId;
+
   if (!sessions[sessionId]) {
-    sessions[sessionId] = {};
-    sessions[sessionId].users = {};
-    sessions[sessionId].squares = JSON.parse(JSON.stringify(SQUARES));
+    return;
   }
   const session = sessions[sessionId];
   const userIdList = Object.keys(session.users);
@@ -66,26 +76,28 @@ app.get('/api/updateBoard/:sessionId', (req, res) => {
 
 const isBoardFull = (squares) => !squares.find((square) => square.value === '');
 
-app.get('/api/squares/:id/:sessionId', (req, res) => {
-  const session = sessions[req.params.sessionId];
+app.get('/api/squares/:userId/:sessionId', (req, res) => {
+  const userId = req.params.userId;
+  const sessionId = req.params.sessionId;
+  const session = sessions[sessionId];
   const userIdList = Object.keys(session.users);
-  if (session.playerTurn && session.playerTurn != req.params.id) {
+  if (session.playerTurn && session.playerTurn != userId) {
     return;
   }
   // Adding the char of the player to the square
   const squareId = req.query.selectedSquareId;
   const square = session.squares[squareId];
   if (square.value === '') {
-    square.value = session.users[req.params.id];
+    square.value = session.users[userId];
     // check for winning
-    if (checkForWin(session.users[req.params.id], session.squares)) {
-      session.result = req.params.id;
+    if (checkForWin(session.users[userId], session.squares)) {
+      session.result = userId;
     } else if (isBoardFull(session.squares)) {
       session.result = 'Draw';
     }
     // Very crude way of saying that it's now the opponents turn
-    session.playerTurn = userIdList.length === 2 ? userIdList.find((user) => user != req.params.id) : userIdList[0];
-    return res.send(session.users[req.params.id]);
+    session.playerTurn = userIdList.length === 2 ? userIdList.find((user) => user != userId) : userIdList[0];
+    return res.send(session.users[userId]);
   }
 });
 

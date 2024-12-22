@@ -1,9 +1,8 @@
 <template>
   <div>
     <button @click="createSession">Create Session</button>
-    <button class="joinSession btn" @click="createSession">Join Session</button>
+    <button class="joinSession btn" @click="joinSession">Join Session</button>
     <input type="text" v-model="joinSessionId" />
-    <!-- <TicTacToe /> -->
   </div>
 </template>
 
@@ -13,26 +12,28 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-let id;
+let userId;
 if (localStorage.userId) {
-  id = localStorage.userId;
+  userId = localStorage.userId;
 } else {
-  id = Math.floor(Math.random() * 100);
-  localStorage.userId = id;
+  userId = Math.floor(Math.random() * 100);
+  localStorage.userId = userId;
 }
 
 let joinSessionId = ref();
 let sessionId;
 
-async function updateUsers() {
-  const response = await fetch(`http://localhost:8000/api/users/${id}/${sessionId}`);
-  const data = await response.text();
-  sessionId = data;
+async function createSession() {
+  const response = await fetch(`http://localhost:8000/api/createSession/${userId}`);
+  sessionId = await response.text();
+  console.log('create session:');
+  console.log(sessionId);
+  router.push({ name: 'Game', params: { sessionId: sessionId } });
 }
 
-async function createSession() {
-  sessionId = joinSessionId.value || 0;
-  await updateUsers();
+async function joinSession() {
+  sessionId = joinSessionId.value;
+  await fetch(`http://localhost:8000/api/joinSession/${userId}/${sessionId}`);
   console.log(sessionId);
   router.push({ name: 'Game', params: { sessionId: sessionId } });
 }
