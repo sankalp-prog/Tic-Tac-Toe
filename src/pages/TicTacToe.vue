@@ -83,7 +83,15 @@ export default {
     },
 
     async resetGame() {
-      fetch(`http://localhost:8000/api/resetGame/${this.sessionId}`);
+      await fetch(`http://localhost:8000/api/resetGame/${this.sessionId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+      console.log('hello');
+      this.result = '';
     },
   },
 };

@@ -89,11 +89,12 @@ app.get('/api/squares/:id/:sessionId', (req, res) => {
   }
 });
 
-app.get('/api/resetGame/:sessionId', (req, res) => {
+app.post('/api/resetGame/:sessionId', (req, res) => {
   const session = sessions[req.params.sessionId];
   session.squares = JSON.parse(JSON.stringify(SQUARES));
   if (session.playerTurn) session.playerTurn = undefined;
   if (session.result) session.result = undefined;
+  return;
 });
 
 app.listen(8000, () => {
