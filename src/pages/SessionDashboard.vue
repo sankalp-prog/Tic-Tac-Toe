@@ -24,7 +24,7 @@ let joinSessionId = ref();
 let sessionId;
 
 async function createSession() {
-  const response = await fetch(`http://localhost:8000/api/createSession/${userId}`);
+  const response = await fetch(`/api/createSession/${userId}`);
   sessionId = await response.text();
   console.log('create session:');
   console.log(sessionId);
@@ -33,7 +33,7 @@ async function createSession() {
 
 async function joinSession() {
   sessionId = joinSessionId.value;
-  await fetch(`http://localhost:8000/api/joinSession/${userId}/${sessionId}`);
+  await fetch(`/api/joinSession/${userId}/${sessionId}`);
   console.log(sessionId);
   router.push({ name: 'Game', params: { sessionId: sessionId } });
 }

@@ -29,7 +29,7 @@ export default {
       if (this.sessionId == 0) {
         return;
       }
-      const response = await fetch(`http://localhost:8000/api/updateBoard/${this.sessionId}`);
+      const response = await fetch(`/api/updateBoard/${this.sessionId}`);
       const data = await response.json();
       this.squares = data.squares;
       if (data.result) {
@@ -77,13 +77,13 @@ export default {
     },
 
     async testBackend(squareId) {
-      const response = await fetch(`http://localhost:8000/api/squares/${userId}/${this.sessionId}?selectedSquareId=${squareId}`);
+      const response = await fetch(`/api/squares/${userId}/${this.sessionId}?selectedSquareId=${squareId}`);
       const data = await response.text();
       return data;
     },
 
     async resetGame() {
-      await fetch(`http://localhost:8000/api/resetGame/${this.sessionId}`, {
+      await fetch(`/api/resetGame/${this.sessionId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
