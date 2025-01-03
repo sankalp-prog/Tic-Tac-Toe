@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express');
 const cors = require('cors');
 const pg = require('pg');
@@ -6,13 +7,12 @@ const app = express();
 
 app.use(cors());
 
-// create a .env to hide all this info before pushing to github.
 const db = new pg.Client({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'tic_tac_toe',
-  password: '',
-  port: 5432,
+  user: process.env.PG_USER,
+  host: process.env.PG_HOST,
+  database: process.env.PG_DATABASE,
+  password: process.env.PG_PASSWORD,
+  port: process.env.PG_PORT,
 });
 
 db.connect();
